@@ -4,7 +4,7 @@ import threading
 
 import geometry_msgs.msg
 from airsim_interfaces.msg import VelCmd
-from airsim_interfaces.srv import *
+from airsim_interfaces.srv import Land, Takeoff
 
 import sys, rclpy, termios, tty
 from typing import List
@@ -13,9 +13,9 @@ from airsim_ros_pkgs.base_teleop_node import BaseTeleopNode
 
 class TeleopKeyboard(BaseTeleopNode):
     def __init__(self) -> None:
-        super.__init__("teleop_twist_keyboard")
+        super().__init__("teleop_twist_keyboard")
 
-        settings = self.saveTerminalSettings()
+        self.settings = self.saveTerminalSettings()
 
         ## initial variables
         self.speed = 0.5
@@ -27,8 +27,8 @@ class TeleopKeyboard(BaseTeleopNode):
         self.status = 0.0
 
         ## parameters
-        stamped = node.declare_parameter('stamped', False).value
-        frame_id = node.declare_parameter('frame_id', '').value
+        stamped = self.declare_parameter('stamped', False).value
+        frame_id = self.declare_parameter('frame_id', '').value
         if not stamped and frame_id:
             raise Exception("'frame_id' can only be set when 'stamped' is True")
 
@@ -40,7 +40,7 @@ class TeleopKeyboard(BaseTeleopNode):
             print(self.msg())
             print(self.vels(self.speed, self.turn))
             while True:
-                key = self.getKey(settings)
+                key = self.getKey(self.settings)
                 if key in self.moveBindings.keys():
                     self.x = self.moveBindings[key][0]
                     self.y = self.moveBindings[key][1]
@@ -55,9 +55,9 @@ class TeleopKeyboard(BaseTeleopNode):
                         print(self.msg())
                     self.status = (self.status + 1) % 15
                 elif key == '1':
-                    setTakeoffMode()
+                    self.setTakeoffMode()
                 elif key == '2':
-                    setLandMode()
+                    self.setLandMode()
                 else:
                     self.x = 0.0
                     self.y = 0.0
@@ -86,9 +86,9 @@ class TeleopKeyboard(BaseTeleopNode):
             twist_msg.twist.angular.z = 0.0
             self.pub.publish(twist_msg)
             rclpy.shutdown()
-            spinner.join()
+            #spinner.join()
 
-            restoreTerminalSettings(settings)
+            self.restoreTerminalSettings(self.settings)
 
     @staticmethod
     def saveTerminalSettings():
@@ -109,6 +109,7 @@ class TeleopKeyboard(BaseTeleopNode):
     @staticmethod
     def getKey(settings: List) -> str:
         if sys.platform == 'win32':
+            import msvcrt 
             # getwch() returns a string on Windows
             key = msvcrt.getwch()
         else:
@@ -118,7 +119,7 @@ class TeleopKeyboard(BaseTeleopNode):
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
         return key
 
-    def setLandMode():
+    def setLandMode(self):
         landService = self.create_client(Land, '/airsim_node/Drone_1/land')
         while not landService.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
@@ -130,7 +131,7 @@ class TeleopKeyboard(BaseTeleopNode):
         except Exception as e:
             self.get_logger().info("service land call failed: %s. The vehicle cannot land "%e)
 
-    def setTakeoffMode():
+    def setTakeoffMode(self):
         takeoffService = self.create_client(Takeoff, '/airsim_node/Drone_1/takeoff')
         while not takeoffService.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')

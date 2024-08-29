@@ -133,9 +133,12 @@ install(TARGETS
 ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
-  scripts/airsim_teleop_twist_keyboard.py
+  airsim_ros_pkgs/__init__.py
+  airsim_ros_pkgs/airsim_teleop_twist_keyboard.py
+  airsim_ros_pkgs/base_teleop_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
+
 
 # rosidl_target_interfaces(airsim_node
 # ${PROJECT_NAME} "rosidl_typesupport_cpp")

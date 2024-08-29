@@ -6,6 +6,7 @@
 #include "std_msgs/msg/string.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "mavros_msgs/msg/position_target.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "std_srvs/srv/trigger.hpp"
 #include "mavros_msgs/srv/command_tol.hpp"
@@ -21,7 +22,9 @@ public:
 
 private:
     void pos_request_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
+    void pos_vel_request_callback(const mavros_msgs::msg::PositionTarget::SharedPtr msg);
     void send_to_pos(const geometry_msgs::msg::PoseStamped &pose);
+    void send_to_pos_with_vel(const mavros_msgs::msg::PositionTarget &pose);
 
     void takeoff_handler_callback(
         const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
@@ -35,7 +38,9 @@ private:
     void arm_drone();
 
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr pos_sub_;
+    rclcpp::Subscription<mavros_msgs::msg::PositionTarget>::SharedPtr pos_vel_sub_;
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr local_pos_pub_;
+    rclcpp::Publisher<mavros_msgs::msg::PositionTarget>::SharedPtr local_pos_pub_raw_;
     rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr takeoff_handler_server_;
     rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr landing_handler_server_;
 

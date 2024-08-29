@@ -15,7 +15,12 @@ DroneController::DroneController()
         "/drone_controller/pos_to_send", 10, 
         std::bind(&DroneController::pos_request_callback, this, std::placeholders::_1));
 
+    pos_vel_sub_ = this->create_subscription<mavros_msgs::msg::PositionTarget>(
+        "/drone_controller/pos_vel_to_send", 10, 
+        std::bind(&DroneController::pos_vel_request_callback, this, std::placeholders::_1));
+
     local_pos_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("mavros/setpoint_position/local", 10);
+    local_pos_pub_raw_ = this->create_publisher<mavros_msgs::msg::PositionTarget>("mavros/setpoint_raw/local", 10);
 
     takeoff_client_ = std::make_shared<TakeoffClient>();
     land_client_ = std::make_shared<LandClient>();
@@ -33,6 +38,11 @@ DroneController::DroneController()
 void DroneController::pos_request_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
     send_to_pos(*msg);
+}
+
+void DroneController::pos_vel_request_callback(const mavros_msgs::msg::PositionTarget::SharedPtr msg)
+{
+    send_to_pos_with_vel(*msg);
 }
 
 void DroneController::takeoff_handler_callback(
@@ -100,6 +110,11 @@ void DroneController::landing_handler_callback(
 void DroneController::send_to_pos(const geometry_msgs::msg::PoseStamped &pose)
 {
     local_pos_pub_->publish(pose);
+    RCLCPP_INFO(this->get_logger(), "Position sent.");
+}
+void DroneController::send_to_pos_with_vel(const mavros_msgs::msg::PositionTarget &pose)
+{
+    local_pos_pub_raw_->publish(pose);
     RCLCPP_INFO(this->get_logger(), "Position sent.");
 }
 

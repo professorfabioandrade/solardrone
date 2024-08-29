@@ -1,7 +1,7 @@
 from setuptools import setup
 
-package_name = 'solar_panels_cv'
-submodules = 'solar_panels_cv.utils'
+package_name = 'solar_panels_img_processing'
+submodules = 'solar_panels_img_processing.utils'
 
 setup(
     name=package_name,
@@ -21,7 +21,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'camera_processing_node = solar_panels_cv.camera_processing_node:main',
+            'canny_node = solar_panels_img_processing.canny_node:main',
+            'georef_node = solar_panels_img_processing.georef_node:main',
         ],
     },
 )

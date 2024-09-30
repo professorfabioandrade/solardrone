@@ -4,12 +4,13 @@ import math
 from typing import Optional, Tuple, Callable
 
 class AzimuthDetector:
-    def __init__(self, info_print: Callable) -> None:
+    def __init__(self, info_print: Callable, vertical: bool = False) -> None:
         self.image: Optional[np.ndarray] = None
         self.edges: Optional[list[np.ndarray]] = None
         self.lines: Optional[list[np.ndarray]] = None
 
         self.print_ = info_print
+        self.vertical = vertical
 
     def __call__(self, img_data: np.ndarray) -> Optional[Tuple[float, float]]:
         self.image = img_data
@@ -18,7 +19,7 @@ class AzimuthDetector:
 
         self.detect_edges()
         self.detect_lines()
-        tilt_angle, distance, pos_line = self.find_horizontal_line_tilt()
+        tilt_angle, distance, pos_line = self.find_line_tilt()
 
         return (tilt_angle, distance, pos_line)
     
@@ -52,9 +53,12 @@ class AzimuthDetector:
     def detect_lines(self) -> None:
         if self.edges is not None:
             all_lines = cv2.HoughLinesP(self.edges, rho=1, theta=np.pi/180, threshold=150, minLineLength=150, maxLineGap=50)
-            self.filter_lines(all_lines)
-            
-    def find_horizontal_line_tilt(self) -> Optional[Tuple[float, float, Tuple[int, int, int, int]]]:
+            if self.vertical:
+                self.filter_vertical_lines(all_lines)
+            else:
+                self.filter_horizontal_lines(all_lines)
+
+    def find_line_tilt(self) -> Optional[Tuple[float, float, Tuple[int, int, int, int]]]:
         if self.lines is None:
             return (None, None, None)
         # Calculate the middle of the image
@@ -85,7 +89,16 @@ class AzimuthDetector:
         
         return (angle, distance, (int(x1), int(y1), int(x2), int(y2)))
     
-    def filter_lines(self, lines: Optional[list[Tuple[float, float, float, float]]]) -> None:
+    def filter_vertical_lines(self, lines: Optional[list[Tuple[float, float, float, float]]]) -> None:
+        if lines is not None:
+                for line in lines:
+                    x1, y1, x2, y2 = line[0]
+                    if abs(y2-y1) > abs(x2-x1):
+                        if self.lines is None:
+                            self.lines = []
+                        self.lines.append(line)
+
+    def filter_horizontal_lines(self, lines: Optional[list[Tuple[float, float, float, float]]]) -> None:
         if lines is not None:
                 for line in lines:
                     x1, y1, x2, y2 = line[0]

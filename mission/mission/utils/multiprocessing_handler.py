@@ -7,6 +7,15 @@ class MultiprocessingHandler:
     def __init__(self, manager: Manager) -> None:
         self.manager_ = manager
 
+    def __del__(self) -> None:
+        try:
+            if self.p_:
+                if self.p_.is_alive():
+                    self.p_.terminate()
+                    self.p_.join()
+        except:
+            pass
+
     def parallel_float_values(self, num_val: int) -> tuple:
         return tuple(
             self.manager_.Value('d', 0.0) for _ in range(num_val)

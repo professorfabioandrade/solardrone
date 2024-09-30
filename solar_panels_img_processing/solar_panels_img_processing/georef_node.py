@@ -5,31 +5,61 @@ from rclpy.node import Node
 from geometry_msgs.msg import Polygon, Point32
 from std_msgs.msg import Float64
 from nav_msgs.msg import Odometry
+from airsim_interfaces.msg import GimbalAngleEulerCmd
 from rclpy.qos import QoSProfile, QoSHistoryPolicy, QoSReliabilityPolicy
 from solar_panels_img_processing.utils.georefering import Georeferencing
-
+from json import loads
 
 
 class GeoreferenceNode(Node):
 
     def __init__(self):
         super().__init__('georef_node')
-        self.georeferencing = Georeferencing()
 
-        self.line_georef_pub = self.create_publisher(Polygon, '/georef_line', 10)
-        self.create_subscription(Polygon, '/detected_line', self.line_callback, 10)
         
-        qos_profile = self.create_qos_profile()
-        
-        self.create_subscription(Odometry, '/mavros/global_position/local', self.global_position_callback, qos_profile)
-        self.create_subscription(Float64, '/mavros/global_position/compass_hdg', self.compass_hdg_callback, qos_profile)
+        self.process_parameters()
+        self.initialize_publishers()
+        self.initialize_subscribers()
 
-    def create_qos_profile(self) -> QoSProfile:
-        return QoSProfile(
-            history=QoSHistoryPolicy.KEEP_LAST,
-            depth=1,
-            reliability=QoSReliabilityPolicy.BEST_EFFORT
-        )
+        self.georeferencing = Georeferencing(self.k_matrix, self.solar_panel_height)
+
+    # ------ Initializing the components ------ #
+    
+    def initialize_publishers(self) -> None:
+        self.line_georef_pub = self.create_publisher(Polygon, self.georef_line_topic_name, 10)
+
+    def initialize_subscribers(self) -> None:
+        qos_profile = QoSProfile(history=QoSHistoryPolicy.KEEP_LAST, depth=1, reliability=QoSReliabilityPolicy.BEST_EFFORT)
+
+        self.create_subscription(Polygon, self.canny_line_topic_name, self.line_callback, 10)
+
+        self.create_subscription(Odometry, self.local_position_topic_name, self.global_position_callback, qos_profile)
+        self.create_subscription(Float64, self.compass_hdg_topic_name, self.compass_hdg_callback, qos_profile)
+        self.create_subscription(GimbalAngleEulerCmd, self.gimbal_topic_name, self.gimbal_angles_callback, 10)
+
+    # ------ Processing Parameters ------ #
+
+    def process_parameters(self) -> None:
+        self.declare_parameter("solar_panel_height", rclpy.Parameter.Type.DOUBLE)
+
+        self.declare_parameter("local_position_topic_name", rclpy.Parameter.Type.STRING)
+        self.declare_parameter("compass_hdg_topic_name", rclpy.Parameter.Type.STRING)
+        self.declare_parameter("georef_line_topic_name", rclpy.Parameter.Type.STRING)
+        self.declare_parameter("canny_line_topic_name", rclpy.Parameter.Type.STRING)
+        self.declare_parameter("gimbal_topic_name", rclpy.Parameter.Type.STRING)
+        self.declare_parameter("K_matrix", rclpy.Parameter.Type.STRING)
+
+        self.solar_panel_height = self.get_parameter("solar_panel_height").get_parameter_value().double_value
+
+        self.local_position_topic_name = self.get_parameter("local_position_topic_name").get_parameter_value().string_value
+        self.compass_hdg_topic_name = self.get_parameter("compass_hdg_topic_name").get_parameter_value().string_value
+        self.georef_line_topic_name = self.get_parameter("georef_line_topic_name").get_parameter_value().string_value
+        self.canny_line_topic_name = self.get_parameter("canny_line_topic_name").get_parameter_value().string_value
+        self.gimbal_topic_name = self.get_parameter("gimbal_topic_name").get_parameter_value().string_value
+
+        self.k_matrix = loads(self.get_parameter("K_matrix").get_parameter_value().string_value)
+            
+    # ------ Handling Callbacks ------ #
 
     def global_position_callback(self, msg: Odometry) -> None:
         self.georeferencing.update_position([
@@ -50,15 +80,22 @@ class GeoreferenceNode(Node):
         P_ENU_end = self.georeferencing(u2, v2)
         self.publish_georeferenced_line(P_ENU_start, P_ENU_end)
 
+    
+    def gimbal_angles_callback(self, msg: GimbalAngleEulerCmd) -> None:
+        self.georeferencing.update_gimbal(msg.roll, msg.pitch, msg.yaw)
+
+    # ------ Publishers function ------ #
+
     def publish_georeferenced_line(self, start: np.ndarray, end: np.ndarray) -> None:
         polygon = Polygon()
         polygon.points.extend([self.create_point32(start), self.create_point32(end)])
         self.line_georef_pub.publish(polygon)
 
-    @staticmethod
-    def create_point32(coord: np.ndarray) -> Point32:
+    # ------ Generate Messages ------ #
+
+    def create_point32(self, coord: np.ndarray) -> Point32:
         print(coord)
-        return Point32(x=float(coord[0]), y=float(coord[1]), z=1.8)
+        return Point32(x=float(coord[0]), y=float(coord[1]), z=self.solar_panel_height)
 
 
 def main(args=None) -> None:

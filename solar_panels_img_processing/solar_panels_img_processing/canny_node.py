@@ -13,24 +13,46 @@ from solar_panels_img_processing.utils.azimuth_detector import AzimuthDetector
 class CannyProcessingNode(Node):
     def __init__(self, show_lines: bool = False) -> Node:
         super().__init__('canny_node')
-        
+
+        self.process_parameters()
+        self.initialize_publishers()
+        self.initialize_subscribers()
+                
+        self.br = CvBridge()
+        self.azimuth = AzimuthDetector(self.get_logger().info, vertical=self.vertical_lines)
+        self.show_lines = show_lines
+        self.frame = None
+
+    # ------ Initializing the components ------ #
+
+    def initialize_publishers(self) -> None:
+        self.tilt_angle_pub = self.create_publisher(Polygon, self.canny_line_topic_name, 10)
+
+    def initialize_subscribers(self) -> None:
         _ = self.create_subscription(
             Image,
-            '/airsim_node/Drone_1/camera_1/Scene',
+            self.airsim_imgs_topic_name,
             self.img_callback,
             10)
         
-        _ = self.create_subscription(Empty, '/camera_trigger', self.trigger_callback, 10)
-        
-        self.tilt_angle_pub = self.create_publisher(Polygon, '/detected_line', 10)
+        _ = self.create_subscription(Empty, self.camera_trigger_topic_name, self.trigger_callback, 10)
 
+    # ------ Processing Parameters ------ #
 
-        self.br = CvBridge()
+    def process_parameters(self) -> None:
+        self.declare_parameter("vertical_lines", rclpy.Parameter.Type.BOOL)
 
-        self.azimuth = AzimuthDetector(self.get_logger().info)
-        self.show_lines = show_lines
+        self.declare_parameter("airsim_imgs_topic_name", rclpy.Parameter.Type.STRING)
+        self.declare_parameter("camera_trigger_topic_name", rclpy.Parameter.Type.STRING)
+        self.declare_parameter("canny_line_topic_name", rclpy.Parameter.Type.STRING)
 
-        self.frame = None
+        self.vertical_lines = self.get_parameter("vertical_lines").get_parameter_value().bool_value
+
+        self.airsim_imgs_topic_name = self.get_parameter("airsim_imgs_topic_name").get_parameter_value().string_value
+        self.camera_trigger_topic_name = self.get_parameter("camera_trigger_topic_name").get_parameter_value().string_value
+        self.canny_line_topic_name = self.get_parameter("canny_line_topic_name").get_parameter_value().string_value
+            
+    # ------ Handling Callbacks ------ #
 
     def img_callback(self, msg: Image) -> None:
         self.frame = msg
@@ -64,6 +86,8 @@ class CannyProcessingNode(Node):
 
         except Exception as e:
             self.get_logger().error(f'Something else happened: {e}')
+
+    # ------ Publisher function ------ #
 
     def pub_angle(self, angle: float, distance: float, pos: Tuple[int, int, int, int]) -> None:
         if angle is not None:

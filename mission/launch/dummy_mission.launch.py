@@ -18,6 +18,7 @@ def get_dummy_mission_params():
     dummy_mission_params["use_waypoints_utm"] = mission_pos.get("use_waypoints_utm")
 
     unreal_environment_params = params.get("unreal_environment", {})    
+    dummy_mission_params["panel_tilt"] = unreal_environment_params.get("panel_tilt")
     dummy_mission_params["waypoint_start_buffer"] = unreal_environment_params.get("waypoint_start_buffer")
     dummy_mission_params["waypoint_end_buffer_x"] = unreal_environment_params.get("waypoint_end_buffer_x")
     dummy_mission_params["waypoint_end_buffer_y"] = unreal_environment_params.get("waypoint_end_buffer_y")
@@ -32,7 +33,7 @@ def get_dummy_mission_params():
     topics = params.get("topic_names", {})
 
     services_names = ["takeoff", "landing"]
-    topics_names = ["waypoint", "camera_trigger", "local_position"]
+    topics_names = ["waypoint", "camera_trigger", "local_position", "compass_hdg", "gimbal"]
 
     for s in services_names:
         dummy_mission_params[f'{s}_service_name'] = services.get(f'{s}')
@@ -50,8 +51,6 @@ def generate_launch_description():
         executable='dummy_mission_node',
         parameters=[dummy_mission_params]
     )
-    
-    
 
     return LaunchDescription([
         dummy_mission_node

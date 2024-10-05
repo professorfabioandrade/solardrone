@@ -3,11 +3,12 @@ from glob import glob
 
 package_name = 'mission'
 submodules = 'mission.utils'
+controllers_submodule = 'mission.controllers'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name, submodules],
+    packages=[package_name, submodules, controllers_submodule],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -24,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'dummy_mission_node = mission.dummy_mission:main',
+            'pid_node = mission.pid_node:main',
         ],
     },
 )

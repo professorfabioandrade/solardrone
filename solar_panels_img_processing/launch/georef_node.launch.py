@@ -15,6 +15,7 @@ def get_georef_params():
     camera_params = params.get("camera", {})
 
     georef_params["solar_panel_height"] = unreal_environment_params.get("solar_panel_height")
+    georef_params["panel_tilt"] = unreal_environment_params.get("panel_tilt")
     georef_params["K_matrix"] = json.dumps(camera_params.get("K_matrix"))
  
     topics = params.get("topic_names", {})
@@ -33,8 +34,6 @@ def generate_launch_description():
         executable='georef_node',
         parameters=[georef_params]
     )
-    
-    
 
     return LaunchDescription([
         georef_node

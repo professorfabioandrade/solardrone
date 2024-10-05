@@ -21,7 +21,7 @@ class GeoreferenceNode(Node):
         self.initialize_publishers()
         self.initialize_subscribers()
 
-        self.georeferencing = Georeferencing(self.k_matrix, self.solar_panel_height)
+        self.georeferencing = Georeferencing(self.k_matrix, self.solar_panel_height, self.panel_tilt)
 
     # ------ Initializing the components ------ #
     
@@ -41,6 +41,7 @@ class GeoreferenceNode(Node):
 
     def process_parameters(self) -> None:
         self.declare_parameter("solar_panel_height", rclpy.Parameter.Type.DOUBLE)
+        self.declare_parameter("panel_tilt", rclpy.Parameter.Type.DOUBLE)   
 
         self.declare_parameter("local_position_topic_name", rclpy.Parameter.Type.STRING)
         self.declare_parameter("compass_hdg_topic_name", rclpy.Parameter.Type.STRING)
@@ -50,6 +51,7 @@ class GeoreferenceNode(Node):
         self.declare_parameter("K_matrix", rclpy.Parameter.Type.STRING)
 
         self.solar_panel_height = self.get_parameter("solar_panel_height").get_parameter_value().double_value
+        self.panel_tilt = self.get_parameter("panel_tilt").get_parameter_value().double_value     
 
         self.local_position_topic_name = self.get_parameter("local_position_topic_name").get_parameter_value().string_value
         self.compass_hdg_topic_name = self.get_parameter("compass_hdg_topic_name").get_parameter_value().string_value

@@ -78,10 +78,12 @@ class GeoreferenceNode(Node):
         u1, v1 = start_point.x, start_point.y
         u2, v2 = end_point.x, end_point.y
 
-        P_ENU_start = self.georeferencing(u1, v1)
-        P_ENU_end = self.georeferencing(u2, v2)
-        self.publish_georeferenced_line(P_ENU_start, P_ENU_end)
-
+        try:
+            P_ENU_start = self.georeferencing(u1, v1)
+            P_ENU_end = self.georeferencing(u2, v2)
+            self.publish_georeferenced_line(P_ENU_start, P_ENU_end)
+        except Exception as e:
+            self.get_logger().warn(f'{e}') 
     
     def gimbal_angles_callback(self, msg: GimbalAngleEulerCmd) -> None:
         self.georeferencing.update_gimbal(msg.roll, msg.pitch, msg.yaw)

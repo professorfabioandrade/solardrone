@@ -28,16 +28,16 @@ class AzimuthDetector:
         # handle variations in illuminations
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (11, 11), 0)
-        return cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 55, 2) 
+        return cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 55, 3) 
     
     @staticmethod
     def morphological_operations(img: np.ndarray) -> np.ndarray:
         # close small gaps within rectangles
-        kernel_close = cv2.getStructuringElement(cv2.MORPH_RECT, (11,11))
+        kernel_close = cv2.getStructuringElement(cv2.MORPH_RECT, (13,13))
         closed = cv2.morphologyEx(img,cv2.MORPH_CLOSE, kernel_close)
 
         # remove internal noise
-        kernel_open = cv2.getStructuringElement(cv2.MORPH_RECT, (13,13))
+        kernel_open = cv2.getStructuringElement(cv2.MORPH_RECT, (25,25))
         opened = cv2.morphologyEx(closed, cv2.MORPH_OPEN, kernel_open)
 
         # close bigger gaps within rectangles

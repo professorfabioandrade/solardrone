@@ -22,6 +22,8 @@ This github contains the codes that run the missions for the autonomous solar pa
 
 All the codes were written in ROS2 framework and are available in [this branch](https://github.com/professorfabioandrade/solardrone/tree/ros2).
 
+The Unreal Engine 5 Environment used in this work is available in [this link](https://uisn-my.sharepoint.com/:u:/g/personal/mmour_usn_no/EVVCEEMyaFFLkYnNiMAXtz8BghpBOk_zLrTcJ8zep5TSTg?e=aiAYtR).
+
 ## Packages description
 
 ### airsim_interfaces

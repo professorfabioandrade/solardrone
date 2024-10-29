@@ -56,15 +56,9 @@ Right now only the Canny algorithm is implemented.
 
 ## Notion Documentation
 
-[Set-up Remote Access with the USN PC](https://www.notion.so/Set-up-Remote-Access-with-the-USN-PC-86849b546e214a9fb138d3bd1ba4bfa8)
-
-[Export Objects from UE4.25 to UE5.2](https://www.notion.so/Export-Objects-from-UE4-25-to-UE5-2-777eeee71d0041eb92479b4c5f87e3c1?pvs=25)
-
 [Install Airsim 5.2](https://www.notion.so/Install-Airsim-5-2-47eeca6c2ea6447c956d6aec769526cf?pvs=25)
 
 [Add Airsim plugin to UE5](https://www.notion.so/Add-Airsim-plugin-to-UE5-ce52d1c1fe1e4f6595cd06a81f18fadd)
-
-[PADS PC](https://www.notion.so/PADS-PC-5e096fcddc864f41addf4043902a1ed4)
 
 ## Dependencies
 

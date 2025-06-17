@@ -172,6 +172,14 @@ $ source install/setup.bash
 $ ros2 launch solar_panels_img_processing canny_with_georef.launch.py
 ```
 
+Alternatively, you can launch the DSEF ([Direct Step Edge Follower](https://www.researchgate.net/publication/390370984_Direct_Step_Edge_Follower_a_novel_edge_follower_algorithm_applied_to_solar_panels_inspections_with_Unmanned_Aerial_Vehicles)) algorithm by using:
+
+```
+$ cd Colosseum/ros2
+$ source install/setup.bash
+$ ros2 launch solar_panels_img_processing dsef_node.launch.py
+```
+
 **Terminal 5: Mission**
 Finally, the terminal that will run the mission. Right now only two missions are implemented, a dummy mission that will basically follow the waypoint, without any kind of control, and a PID mission, that will constantly update it's position using a PID algorithm to track the line.
 

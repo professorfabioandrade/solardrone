@@ -11,7 +11,7 @@
   <a href="#how-to-run">How to Run</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#troubleshooting">Troubleshooting</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#features">Features</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#References">References</a>
+  <a href="#published-works">Published Works</a>
 </p>
 
 <br />
@@ -233,6 +233,35 @@ $ param set ARMING_CHECK 0
 - [x] Dummy Mission (just a code that follows the waypoints, without a control)
 - [x] PID Mission
 - [ ] MPC Mission
-- [ ] DSEF Line Detection
+- [x] DSEF Line Detection
 
-## References
+## Published Works
+
+[Unreal Engine 5 Simulations of Solar Plant Inspections by Unmanned Aerial Systems with Robot Operating System 2](https://www.researchgate.net/publication/389273310_Unreal_Engine_5_Simulations_of_Solar_Plant_Inspections_by_Unmanned_Aerial_Systems_with_Robot_Operating_System_2)
+
+Cite as
+
+```bibtex
+@misc{andrade2025solar,
+  title        = {Unreal Engine 5 Simulations of Solar Plant Inspections by Unmanned Aerial Systems with Robot Operating System 2},
+  author       = {Andrade, Fabio A. A. and Sivertsen, Agnar and Moura, Marcos and Clarino, Lucas and Gonzales, Gabriel and Albuquerque, Luis and Correia, Carlos and Petraglia, Mariane and Zachi, Alessandro R.},
+  year         = {2025},
+  note         = {11th IFAC Conference on Manufacturing Modelling, Management and Control},
+}
+```
+
+[Direct Step Edge Follower: a novel edge follower algorithm applied to solar panels inspections with Unmanned Aerial Vehicles](https://www.researchgate.net/publication/390370984_Direct_Step_Edge_Follower_a_novel_edge_follower_algorithm_applied_to_solar_panels_inspections_with_Unmanned_Aerial_Vehicles)
+
+Cite as
+
+```bibtex
+@article{Sivertsen2025DSEF,
+  author    = {Agnar Sivertsen and Fabio A. A. Andrade and Marcos Moura and Carlos A. M. Correia and Mariane R. Petraglia},
+  title     = {Direct Step Edge Follower: a novel edge follower algorithm applied to solar panels inspections with Unmanned Aerial Vehicles},
+  journal   = {Preprint},
+  year      = {2025},
+  month     = {April},
+  url       = {https://www.researchgate.net/publication/390370984_Direct_Step_Edge_Follower_a_novel_edge_follower_algorithm_applied_to_solar_panels_inspections_with_Unmanned_Aerial_Vehicles}
+}
+
+```
